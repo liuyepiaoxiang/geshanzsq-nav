@@ -12,6 +12,7 @@ import store from './store'
 import router from './router'
 import permission from './directive/permission'
 
+import i18n from './i18n/index'; 
 import './assets/icons' // icon
 import './permission' // permission control
 import { getDicts } from "@/api/system/dict/data";
@@ -83,7 +84,8 @@ Vue.config.productionTip = false
 
 new Vue({
   el: '#app',
+  i18n,
   router,
   store,
-  render: h => h(App)
-})
+  render: (h) => h(App),
+});
