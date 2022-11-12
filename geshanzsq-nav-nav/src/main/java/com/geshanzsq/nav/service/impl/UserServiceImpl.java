@@ -2,6 +2,7 @@ package com.geshanzsq.nav.service.impl;
 
 import com.geshanzsq.common.utils.DateUtils;
 import com.geshanzsq.nav.domain.User;
+import com.geshanzsq.nav.mapper.NavSiteMapper;
 import com.geshanzsq.nav.mapper.UserMapper;
 import com.geshanzsq.nav.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,10 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private NavSiteMapper navSiteMapper;
+
+    @Override
     public int insertOrUpdateUser(User user) {
         user.setUpdateTime(DateUtils.getNowDate());
         user.setCreateTime(DateUtils.getNowDate());
@@ -31,6 +36,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     public int updatePledgeCount(User user) {
         return userMapper.updatePledgeCount(user);
+    }
+
+    @Override
+    public long sumClickCountByUserWalletAddress(String userWalletAddress) {
+        return navSiteMapper.sumClickCountByUserWalletAddress(userWalletAddress);
     }
 
 }
