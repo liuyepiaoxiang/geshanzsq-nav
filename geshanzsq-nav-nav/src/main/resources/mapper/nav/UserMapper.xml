@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geshanzsq.nav.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="User" type="com.geshanzsq.nav.domain.User">
+        <id column="uid" property="uid" />
+        <result column="user_name" property="userName" />
+        <result column="wallet_address" property="walletAddress" />
+        <result column="pledge_count" property="pledgeCount" />
+        <result column="avatar" property="avatar" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="selectByWalletAddress">
+        select uid,
+               user_name,
+               wallet_address,
+               pledge_count,
+               avatar,
+               create_time,
+               update_time
+        from user
+        where wallet_address = #{walletAddress}
+    </sql>
+
+    <insert id="insertOrUpdateUser" parameterType="User" useGeneratedKeys="true" >
+        INSERT INTO user(wallet_address, create_time, update_time)
+        VALUES (#{walletAddress}, #{createTime}, #{updateTime})
+        ON DUPLICATE KEY UPDATE
+            wallet_address = #{walletAddress},
+            update_time =now()
+    </insert>
+
+
+    <update id="updatePledgeCount" parameterType="User">
+        update user set pledge_count = #{pledgeCount}
+        where wallet_address = #{walletAddress}
+    </update>
+
+</mapper>
