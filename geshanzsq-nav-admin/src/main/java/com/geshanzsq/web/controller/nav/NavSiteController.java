@@ -118,4 +118,16 @@ public class NavSiteController extends BaseController
     public AjaxResult getSiteMaxOrderNum(Long menuId) {
         return AjaxResult.success(navSiteService.getSiteMaxOrderNum(menuId));
     }
+
+    /**
+     * 更新站点点击量
+     */
+    @PostMapping("/updateClickCount/{siteId}")
+    public AjaxResult updateClickCountBySiteId(@PathVariable("siteId") Long siteId) {
+        boolean result = navSiteService.updateClickCountBySiteId(siteId);
+        if (result)
+            return AjaxResult.success("更新成功");
+        else return AjaxResult.error("更新失败");
+    }
+
 }
