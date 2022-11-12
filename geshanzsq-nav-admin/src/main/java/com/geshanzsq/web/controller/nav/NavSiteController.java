@@ -125,9 +125,11 @@ public class NavSiteController extends BaseController
     @PostMapping("/updateClickCount/{siteId}")
     public AjaxResult updateClickCountBySiteId(@PathVariable("siteId") Long siteId) {
         boolean result = navSiteService.updateClickCountBySiteId(siteId);
-        if (result)
+        if (result) {
             return AjaxResult.success("更新成功");
-        else return AjaxResult.error("更新失败");
+        } else {
+            return AjaxResult.error("更新失败");
+        }
     }
 
 }

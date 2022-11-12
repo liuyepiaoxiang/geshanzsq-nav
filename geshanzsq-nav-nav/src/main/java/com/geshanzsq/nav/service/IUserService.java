@@ -11,6 +11,9 @@ import com.geshanzsq.nav.domain.User;
  * @since 2022-11-11
  */
 public interface IUserService {
-    public int insertOrUpdateUser(User user);
-    public int updatePledgeCount(User user);
+	int insertOrUpdateUser(User user);
+
+	int updatePledgeCount(User user);
+
+	long sumClickCountByUserWalletAddress(String userWalletAddress);
 }
