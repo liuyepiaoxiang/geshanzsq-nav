@@ -73,6 +73,11 @@ public interface NavSiteMapper
     int getSiteClickCount(@Param("status") Integer status);
 
     /**
+     * 根据用户获取名下地址点击量
+     */
+    long sumClickCountByUserWalletAddress(@Param("userWalletAddress") String  userWalletAddress);
+
+    /**
      * 网站数量
      */
     int getCount(@Param("status") Integer status);
