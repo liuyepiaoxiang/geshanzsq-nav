@@ -7,7 +7,8 @@ const user = {
     name: '',
     avatar: '',
     roles: [],
-    permissions: []
+    permissions: [],
+    address: '',
   },
 
   mutations: {
@@ -25,6 +26,9 @@ const user = {
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
+    },
+    SET_ADDRESS: (state, address) => {
+      state.address = address
     }
   },
 
