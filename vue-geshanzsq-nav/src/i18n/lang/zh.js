@@ -13,6 +13,9 @@ const zh = {
     firefox_plugin: 'Firefox插件地址',
     install_lesson: ''
   },
+  nav: {
+    add: '添加导航',
+  }
 };
 
 export default zh;

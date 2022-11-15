@@ -13,6 +13,9 @@ const en = {
     firefox_plugin: 'Firefox plugin',
     install_lesson: '',
   },
+  nav: {
+    add: 'Add Navgation Info',
+  },
 };
 
 export default en;

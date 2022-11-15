@@ -2,11 +2,12 @@
     <front-home :menu-list="menuList">
       <div slot="mainContainer" class="app-container"
            v-loading="loading" element-loading-text="拼命加载中，请稍等..." element-loading-spinner="el-icon-loading">
-        <el-row :gutter="24" type="flex" justify="center">
-          <el-col :sm="16" :sx="24">
+        <!-- <el-row :gutter="24" type="flex" justify="center">
+           <el-col :sm="16" :sx="24">
             <search class="search"/>
-          </el-col>
-        </el-row>
+          </el-col> 
+        </el-row> -->
+        <addNavPanel></addNavPanel>
         <div v-for="menu in siteList">
           <h4 v-if="menu.siteList" :id="'item-' + menu.menuId" :ref="'item-' +menu.menuId">
             <svg-icon icon-class="tag" style="margin-right: 7px;font-size: 18px"/>
@@ -27,6 +28,7 @@
   import Search from "@/components/Search";
   import SiteCard from "@/components/SiteCard/SiteCard";
   import FooterBottom from '@/components/FooterBottom'
+  import addNavPanel from '@/components/addNavPanel'
   import FrontHome from './FrontHome';
 
   import { mapState } from 'vuex'
@@ -45,6 +47,7 @@
       Navbar,
       Sidebar,
       Search,
+      addNavPanel,
       SiteCard,
       FooterBottom,
       FrontHome

@@ -46,15 +46,13 @@ export default {
         }
     },
     created() {
+       
+    },
+     mounted() {
         const isIntalled = this.isMetaMaskInstalled();
         if(!isIntalled) {
             this.showDialog = true;
         } else {
-            this.init();
-        }
-    },
-     mounted() {
-        if (this.isConnect) {
             this.init();
         }
     },
@@ -68,7 +66,7 @@ export default {
                 } catch (error) {
                     console.log(error)
                     if(error.code) {
-                        this.$message.error('User')
+                        this.$message.error('User rejected')
                     }
                 }
             } else if (window.web3) {
