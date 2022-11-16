@@ -4,6 +4,7 @@
         :visible.sync="showDialog"
         :before-close="closeDialog"
         :close-on-click-modal="false"
+        append-to-body
         class="dialog"
       >
         <div class="dialog-content">

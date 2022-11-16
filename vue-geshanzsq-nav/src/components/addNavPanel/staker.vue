@@ -34,9 +34,9 @@ export default {
     },
     methods: {
         InitContract() {
-            if(window.web3 && this.$store.user.address) {
+            if(window.web3 && this.$store.getters.address) {
                 this.stakerOperator = new web3.eth.Contract(Staker, this.stakerAddress)
-                this.balances = this.stakerOperator.methods.balances(this.$store.user.address)
+                this.balances = this.stakerOperator.methods.balances(this.$store.getters.address)
                 if(this.balances !== 0) {
                     this.isUserStaked = true;
                 }

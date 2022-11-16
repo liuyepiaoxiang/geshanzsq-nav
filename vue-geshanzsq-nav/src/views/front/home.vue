@@ -105,6 +105,7 @@
           if (response.code == 200) {
             this.menuList = response.menus;
             this.siteList = response.sites;
+            this.$store.commit('ADD_MENUS', this.menuList)
             this.loading = false;
           }
         })
