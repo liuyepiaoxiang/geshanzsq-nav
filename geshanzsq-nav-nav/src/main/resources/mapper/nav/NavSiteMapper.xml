@@ -20,6 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="orderNum"    column="order_num"    />
         <result property="clickCount"    column="click_count"    />
         <result property="userWalletAddress"    column="user_wallet_address"    />
+        <result property="ipfsUrl"    column="ipfs_url"    />
     </resultMap>
 
     <sql id="selectNavSiteVO">
@@ -34,7 +35,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             nt.create_time,
             nt.status,
             nt.order_num,
-            nt.click_count
+            nt.click_count,
+            nt.user_wallet_address,
+            nt.ipfs_url
         from nav_site nt
         left join nav_menu nc on nt.menu_id = nc.menu_id
     </sql>
@@ -73,6 +76,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="status != null">status,</if>
             <if test="orderNum != null">order_num,</if>
+            <if test="userWalletAddress != null">user_wallet_address,</if>
+            <if test="ipfsUrl != null">ipfs_url,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="menuId != null">#{menuId},</if>
@@ -86,6 +91,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="status != null">#{status},</if>
             <if test="orderNum != null">#{orderNum},</if>
+            <if test="userWalletAddress != null">#{userWalletAddress},</if>
+            <if test="ipfsUrl != null">#{ipfsUrl},</if>
          </trim>
     </insert>
 
@@ -101,6 +108,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="status != null">status = #{status},</if>
             <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="userWalletAddress != null">user_wallet_address = #{userWalletAddress},</if>
+            <if test="ipfsUrl != null">ipfs_url = #{ipfsUrl},</if>
         </trim>
         where site_id = #{siteId}
     </update>
