@@ -51,7 +51,7 @@ public class NavSite extends BaseEntity implements Serializable {
     private Integer clickCount;
 
     /** 用户钱包地址 */
-    private String walletAddress;
+    private String userWalletAddress;
 
     /** 图片ipfs地址 */
     private String ipfsUrl;
