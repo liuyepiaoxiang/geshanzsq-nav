@@ -1,6 +1,6 @@
 <template>
   <el-card shadow="hover" class="site-card"
-           @click.native="handleCard(site.siteUrl)"
+           @click.native="handleCard(site.siteUrl, site.siteId)"
            @mouseenter.native="siteCardEnter($event)"
            @mouseleave.native="siteCardLeave($event)">
     <el-container>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { updateNavClickCount} from '@/api/front/frontNav';
 
   export default {
     name: "SiteCard",
@@ -55,7 +56,8 @@
     },
     methods: {
       // 点击网站时，打开事件
-      handleCard(url) {
+      handleCard(url, siteId) {
+        updateNavClickCount(siteId).then(res => console.log)
         window.open(url, "_blank");
       },
       siteCardEnter(event) {

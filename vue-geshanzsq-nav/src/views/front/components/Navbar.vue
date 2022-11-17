@@ -2,7 +2,7 @@
   <div class="navbar">
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
-    <weather v-if="device != 'mobile'" style="margin: 15px;float: left"/>
+    <!-- <weather v-if="device != 'mobile'" style="margin: 15px;float: left"/> -->
     <connect-wallet style="margin: 15px;float: right"></connect-wallet>
   </div>
 </template>

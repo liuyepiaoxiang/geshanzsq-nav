@@ -39,3 +39,28 @@ export function getCommentList() {
     method: 'get'
   })
 }
+
+// 增加导航点击数量
+export function updateNavClickCount(siteId) {
+  return request({
+    url: `/frontNav/updateClickCount/${siteId}`,
+    method: 'get',
+  });
+}
+
+// 获取用户点击总量
+export function getUserClickCount(wallet) {
+  return request({
+    url: `/user/sumClickCount/${wallet}`,
+    method: 'get',
+  });
+}
+
+// 增加站点导航信息
+export function addSiteInfo(data) {
+  return request({
+    url: '/frontNav/site/add',
+    method: 'post',
+    data,
+  });
+}
