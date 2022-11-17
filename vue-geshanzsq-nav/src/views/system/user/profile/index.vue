@@ -6,36 +6,18 @@
           <div slot="header" class="clearfix">
             <span>个人信息</span>
           </div>
-          <div>
-            <div class="text-center">
-              <userAvatar :user="user" />
+          <div class="personal_contain">
+            <div class="reward">
+              <p>当前收益: 100000web3n</p>
+              <el-button :disabled="stackStatus" @click="getReward">领取收益</el-button>
+              <el-button :disabled="!stackStatus" @click="staker">质押</el-button>
             </div>
-            <ul class="list-group list-group-striped">
-              <li class="list-group-item">
-                <svg-icon icon-class="user" />用户名称
-                <div class="pull-right">{{ user.userName }}</div>
-              </li>
-              <li class="list-group-item">
-                <svg-icon icon-class="phone" />手机号码
-                <div class="pull-right">{{ user.phonenumber }}</div>
-              </li>
-              <li class="list-group-item">
-                <svg-icon icon-class="email" />用户邮箱
-                <div class="pull-right">{{ user.email }}</div>
-              </li>
-              <li class="list-group-item">
-                <svg-icon icon-class="tree" />所属部门
-                <div class="pull-right" v-if="user.dept">{{ user.dept.deptName }} / {{ postGroup }}</div>
-              </li>
-              <li class="list-group-item">
-                <svg-icon icon-class="peoples" />所属角色
-                <div class="pull-right">{{ roleGroup }}</div>
-              </li>
-              <li class="list-group-item">
-                <svg-icon icon-class="date" />创建日期
-                <div class="pull-right">{{ user.createTime }}</div>
-              </li>
-            </ul>
+            <p>我的创作</p>
+            <el-card class="box-card">
+              <div v-for="o in 4" :key="o" class="text item">
+                {{'列表内容 ' + o }}
+              </div>
+            </el-card>
           </div>
         </el-card>
       </el-col>
@@ -89,3 +71,22 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+.personal_contain {
+  width: 100%;
+  height: 100%;
+  padding-top: 30px;
+  .reward {
+    width: 800px;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+    padding: 5px 20px;
+    box-sizing: border-box;
+  }
+}
+</style>

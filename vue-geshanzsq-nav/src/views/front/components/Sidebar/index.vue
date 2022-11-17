@@ -22,7 +22,7 @@
 
         <router-link to="/about">
           <el-menu-item index="about">
-            <item icon="heart" title="关于本站"/>
+            <item icon="heart" title="个人中心"/>
           </el-menu-item>
         </router-link>
       </el-menu>
