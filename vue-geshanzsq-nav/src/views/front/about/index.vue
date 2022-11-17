@@ -2,55 +2,35 @@
   <div style="padding: 0px">
     <front-home :menu-list="menuList">
       <div slot="mainContainer" style="padding: 20px 5px 0px 5px">
-        <el-card :style="{width: (isMobile ? '100%' : '90%'),margin:'auto'}"
-                 v-loading="loading"
-                 element-loading-text="拼命加载中，请稍等..."
-                 element-loading-spinner="el-icon-loading">
-          <div>
-            <div class="about-content"  v-highlight v-html="webConfig.aboutWebContent" ></div>
+        <div class="personal_contain">
+          <div class="reward">
+            <p>当前收益: {{dist}} nav</p>
+            <el-button :disabled="stackStatus" @click="getReward">领取收益</el-button>
+            <el-button :disabled="!stackStatus" @click="staker">质押</el-button>
+            <el-button :disabled="stackStatus" @click="cancelStaker">取消质押</el-button>
           </div>
-
-          <!-- 关于作者 -->
-          <h4>关于作者</h4>
-          <el-row :gutter="24">
-            <el-col :sm="6" :sx="24">
-              <el-card style="height: 80px">
-                <el-container>
-                  <el-aside  style="background-color: white;width: 40px;padding: 0;text-align: center;">
-                    <el-image class="about-author-avatar"  :src="baseUrl + webConfig.avatar" >
-                      <div slot="error" class="image-slot">
-                        <el-image class="about-author-avatar" :src="require('@/assets/images/profile.jpg')" ></el-image>
-                      </div>
-                    </el-image>
-                  </el-aside>
-                  <el-main style="padding: 0;margin-left: 5px" >
-                    <a style="font-size: 14px"><strong>{{webConfig.nickName}}</strong></a>
-                    <p style="font-size: 14px;color: #979898;margin-top: 5px">{{webConfig.aboutWebEmail}}</p>
-                  </el-main>
-                </el-container>
-                <div>
-                </div>
-              </el-card>
-            </el-col>
-            <el-col :sm="18" :sx="24">
-              <div style="border-left: 5px solid #eee;padding: 9px 18px;color: #979898;">{{webConfig.aboutWebDescription}}</div>
-            </el-col>
-          </el-row>
-
-          <!-- 评论 -->
-          <comment style="margin-top: 50px"/>
-        </el-card>
+          <p>我的创作</p>
+          <el-card class="box-card">
+            <div v-for="o in 4" :key="o" class="text item">
+              {{'列表内容 ' + o }}
+            </div>
+          </el-card>
+        </div>
       </div>
     </front-home>
   </div>
 </template>
 
 <script>
+  import Web3 from 'web3';
   import FooterBottom from '@/components/FooterBottom'
   import FrontHome from '@/views/front/FrontHome';
   import Comment from './components/Comment'
 
   import { getNavAbout, getFrontMenu } from '@/api/front/frontNav'
+
+  import Staker from '@/api/abi/Staker.json';
+  import Distribution from '@/api/abi/Distribution.json';
 
   import { mapState } from 'vuex'
   import ResizeMixin from '@/views/front/mixin/ResizeHandler'
@@ -65,6 +45,12 @@
         // 图片基本地址
         baseUrl: process.env.VUE_APP_BASE_FILE,
         webConfig: {},
+        stakerAddress: '0x3DAD3B10a77f4E0bA43c2FA79Cc48D5AB7B16F45',
+        stackStatus: false,
+        distributionAddress: '0x60695ffCA42Bc16Ce08fC013AfECbe4902033c9a',
+        stackStatus: false,
+        erc20Arress: '0x21F813B20373D9B3dCf296e2c8d4c44fE507a162',
+        dist: 60
       }
     },
     mixins: [ResizeMixin],
@@ -78,7 +64,7 @@
     },
     created() {
       this.getFrontMenu();
-      this.getNavAbout();
+      // this.getNavAbout();
     },
     methods: {
       //查询菜单
@@ -97,20 +83,77 @@
           this.loading = false;
         })
       },
-    }
+      async getReward() {
+        console.log(1, 'distributContract', this.address)
+        let distributContract =  new this.web3.eth.Contract(Distribution, this.distributionAddress, {
+          from: this.address
+        })
+        let rest = await distributContract.methods.requestVolumeData().send({from: this.address})
+        this.$message.success('提取成功')
+      },
+      async staker() {
+        if(window.web3) {
+            this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+            await this.stakerContract.methods.stake().send({
+                from: this.address,
+                value: 1000000000
+            })
+            console.log(this.stakerContract, '_this.stakerOperator_')
+            // this.balances = this.stakerOperator.methods.balances(this.$store.user.address)
+            // if(this.balances !== 0) {
+            //     this.isUserStaked = true;
+            // }
+        }
+      },
+      checkAccounts() {
+        if (this.web3 === null) return;
+        this.web3.eth.getAccounts((err, accounts) => {
+            if (err != null)
+                return this.Log(this.MetamaskMsg.NETWORK_ERROR, "NETWORK_ERROR");
+            if (accounts.length === 0) {
+                this.account = "";
+                this.Log(this.MetamaskMsg.EMPTY_METAMASK_ACCOUNT, "NO_LOGIN");
+                return;
+            }
+            this.account = accounts[0]; // user Address
+            this.$store.commit('SET_ADDRESS', this.account);
+            this.isConnect = true;
+        });
+      },
+      async initContract() {
+        if(window.web3) {
+          this.web3 = new Web3(web3.currentProvider)
+          let address = await this.web3.eth.getAccounts()
+          this.address = address[0]
+          this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+          this.stackStatus = await this.stakerContract.methods.getUserStackStatus().call()
+        }
+      },
+      cancelStaker() {
 
+      }
+    },
+    mounted() {
+      this.initContract()
+    }
   }
 </script>
 
-<style scoped>
-  .about-author-avatar {
-    border-radius: 20px;
-    width: 40px;
-    height: 40px
+<style scoped lang="scss">
+.personal_contain {
+  width: 100%;
+  height: 100%;
+  padding-top: 30px;
+  .reward {
+    width: 800px;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+    padding: 5px 20px;
+    box-sizing: border-box;
   }
-  /*设置图片，以防过大*/
-  .about-content >>> img {
-    max-width: 100%;
-    height: auto;
-  }
+}
 </style>
