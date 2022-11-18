@@ -39,7 +39,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public long sumClickCountByUserWalletAddress(String userWalletAddress) {
+    public Long sumClickCountByUserWalletAddress(String userWalletAddress) {
         return navSiteMapper.sumClickCountByUserWalletAddress(userWalletAddress);
     }
 
