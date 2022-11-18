@@ -140,7 +140,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!-- 获取网站点击量 -->
-    <select id="sumClickCountByUserWalletAddress" parameterType="String" resultType="long">
+    <select id="sumClickCountByUserWalletAddress" parameterType="String" resultType="Long">
         select sum(click_count) from nav_site
         <where>
             <if test="userWalletAddress != null">user_wallet_address = #{userWalletAddress}</if>

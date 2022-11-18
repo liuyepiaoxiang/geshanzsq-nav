@@ -58,7 +58,7 @@ public class UserController extends BaseController {
     @GetMapping(value = "/sumClickCount")
     @ApiOperation(value = "统计用户浏览量", notes = "新增客户")
     public AjaxResult updatePledge(String userWalletAddress){
-        long result = userService.sumClickCountByUserWalletAddress(userWalletAddress);
+        Long result = userService.sumClickCountByUserWalletAddress(userWalletAddress);
         return AjaxResult.success(result);
     }
 
