@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: 'web3导航',
+      title: 'web3NAV',
       logo: logoImg
     }
   }

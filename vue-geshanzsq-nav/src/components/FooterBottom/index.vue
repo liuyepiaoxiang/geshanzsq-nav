@@ -1,8 +1,8 @@
 <template>
   <div class="footer">
     <el-divider></el-divider>
-    Copyright &copy; 2020-2022 <a href="/">web3导航</a>
-    选择主题 <a href="#">web3导航</a>
+    Copyright &copy; 2020-2022 <a href="/">web3NAV</a>
+    选择主题 <a href="https://nav.geshanzsq.com">web3NAV</a>
   </div>
 </template>
 

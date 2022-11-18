@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'web3导航',
+  title: 'web3NAV',
 
   /**
    * 侧边栏主题 深色主题theme-dark，浅色主题theme-light
