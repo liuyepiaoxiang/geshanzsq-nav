@@ -75,7 +75,7 @@ public interface NavSiteMapper
     /**
      * 根据用户获取名下地址点击量
      */
-    long sumClickCountByUserWalletAddress(@Param("userWalletAddress") String  userWalletAddress);
+    Long sumClickCountByUserWalletAddress(@Param("userWalletAddress") String  userWalletAddress);
 
     /**
      * 网站数量
