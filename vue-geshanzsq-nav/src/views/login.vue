@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">格姗知识圈导航系统</h3>
+      <h3 class="title">web3导航系统</h3>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -55,7 +55,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2020-2022 nav.geshanzsq.com All Rights Reserved.</span>
+      <span>Copyright © 2020-2022 web3Nav All Rights Reserved.</span>
     </div>
   </div>
 </template>
