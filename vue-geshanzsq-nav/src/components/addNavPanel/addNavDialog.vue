@@ -7,38 +7,38 @@
     class="dialog">
       <div class="dialog-content">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm"  class="ruleForm">
-          <el-form-item label="请选择你要添加的导航分类" prop="navType">
-            <el-select v-model="ruleForm.navType">
+          <el-form-item label="请选择你要添加的导航分类" prop="menuId">
+            <el-select v-model="ruleForm.menuId">
               <el-option v-for="nav in menus" 
               :key="nav.menuId" 
               :label="nav.menuName" 
               :value="nav.menuId"></el-option>
              </el-select>
           </el-form-item>
-          <el-form-item label="请填写导航名称" prop="navName">
+          <el-form-item label="请填写导航名称" prop="menuName">
             <el-input
                     type="text"
                     placeholder="请输入导航名称"
-                    v-model="ruleForm.navName"
+                    v-model="ruleForm.menuName"
                     maxlength="24"
                     show-word-limit
                   >
                   </el-input>
           </el-form-item>
-          <el-form-item label="请填写导航介绍" prop="navDescription">
+          <el-form-item label="请填写导航介绍" prop="siteDescription">
             <el-input
                   type="textarea"
                   placeholder="请输入内容"
-                  v-model="ruleForm.navDescription"
+                  v-model="ruleForm.siteDescription"
                   maxlength="100"
                   show-word-limit
                 ></el-input>
           </el-form-item>
-          <el-form-item label="请填写导航链接" prop="navLink">
+          <el-form-item label="请填写导航链接" prop="siteUrl">
              <el-input
                 type="text"
                 placeholder="请输入导航链接"
-                v-model="ruleForm.navLink"
+                v-model="ruleForm.siteUrl"
               >
               </el-input>
           </el-form-item>
@@ -83,20 +83,20 @@ export default {
         dialogImageUrl: '',
         dialogVisible: false,
         ruleForm: {
-          navType: '',
-          navName: '',
-          navDescription: '',
-          navLink: '',
+          menuId: '',
+          menuName: '',
+          siteDescription: '',
+          siteUrl: '',
         },
         rules: {
-          navName: [
+          menuName: [
             { required: true, message: '请输入导航名称', trigger: 'blur' },
             { min: 3, max: 10, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
-          navType: [
+          menuId: [
             { required: true, message: '请选择活动区域', trigger: 'change' }
           ],
-          navLink: [
+          siteUrl: [
             { required: true, message: '请输入导航链接', trigger: 'blur' },
           ],
           desc: [
@@ -130,7 +130,13 @@ export default {
     submit(){
        this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
-            addSiteInfo(valid).then(res => {
+            console.log('valid', valid);
+            const walletAddress = this.$store.getters.address;
+            const site = {
+              ...this.ruleForm,
+              walletAddress,
+            }
+            addSiteInfo(site).then(res => {
               console.log(res);
               this.closeDialog();
             })
