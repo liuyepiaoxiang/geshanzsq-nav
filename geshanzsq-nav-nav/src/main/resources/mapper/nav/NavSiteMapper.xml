@@ -53,6 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 )
             </if>
             <if test="status != null "> and nt.status = #{status} and nc.status = #{status}</if>
+            <if test="userWalletAddress != null "> and nt.user_wallet_address = #{userWalletAddress}</if>
         </where>
         order by nc.parent_id, nc.order_num,nt.order_num
     </select>
