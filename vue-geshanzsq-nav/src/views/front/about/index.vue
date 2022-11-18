@@ -4,12 +4,18 @@
       <div slot="mainContainer" style="padding: 20px;height: calc(100vh - 137px);">
         <div class="personal_contain">
           <div class="reward">
-            <p>累计点击量: {{ profit }}</p>
-            <!-- <p>累计点击量: profit{{ / 5}} nav</p> -->
-            <el-button :disabled="!stackStatus" @click="getReward">领取收益</el-button>
-            <!-- <el-button :disabled="stackStatus" @click="getReward">领取收益</el-button> -->
-            <el-button :disabled="stackStatus" @click="staker">质押</el-button>
-            <el-button :disabled="!stackStatus" @click="cancelStaker">取消质押</el-button>
+            <p style="margin-bottom: 12px;">作品累计点击量: {{ profit }}</p>
+            <div>
+              <p>可换取收益: {{ profit / 5 }}</p>
+              <el-button :disabled="!stackStatus" @click="getReward">领取收益</el-button>
+            </div>
+            <div style="text-align:center">
+              <p style="margin-bottom: 12px;">质押状态：{{stackStatus ? '已完成质押' : '未参与质押'}}</p>
+              <div style="">
+                <el-button :disabled="stackStatus" @click="staker">参与质押</el-button>
+                <el-button :disabled="!stackStatus" @click="cancelStaker">取消质押</el-button>
+              </div>
+            </div>
           </div>
           <!-- <p>我的创作</p> -->
           <el-row :gutter="24" >
@@ -104,17 +110,14 @@
         // let rest = await distributContract.methods.requestVolumeData().send({from: this.address})
       },
       async staker() {
-        if(window.web3) {
+        if(window.ethereum) {
             this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
             await this.stakerContract.methods.stake().send({
                 from: this.address,
                 value: 1000000000
             })
-            console.log(this.stakerContract, '_this.stakerOperator_')
-            // this.balances = this.stakerOperator.methods.balances(this.$store.user.address)
-            // if(this.balances !== 0) {
-            //     this.isUserStaked = true;
-            // }
+        } else {
+          this.$message.warning("请安装metamask钱包")
         }
       },
       checkAccounts() {
@@ -133,7 +136,7 @@
         });
       },
       async initContract() {
-        if(window.web3) {
+        if(window.ethereum) {
           this.web3 = new Web3(web3.currentProvider)
           let address = await this.web3.eth.getAccounts()
           this.address = address[0]
@@ -142,20 +145,14 @@
           let status = await this.stakerContract.methods.getUserStackStatus().call({
             from: this.address
           })
-          console.log('_initContract_', status)
-
           this.stackStatus = status
         }
       },
       async cancelStaker() {
-        if(window.web3) {
-            // this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+        if(window.ethereum) {
             let response = await this.stakerContract.methods.withdraw().send({from: this.address})
-            console.log(response, '_this.stakerOperator_')
-            // this.balances = this.stakerOperator.methods.balances(this.$store.user.address)
-            // if(this.balances !== 0) {
-            //     this.isUserStaked = true;
-            // }
+        } else {
+          this.$message.warning("请安装metamask钱包")
         }
       },
       getUserNavList() {
@@ -171,7 +168,7 @@
       },
       getUserProfit() {
         let params = {
-          userWalletAddress: '0x0914f881EC583fCD460031A93B135B9a706ADeBE'
+          userWalletAddress: this.address
         }
         getUserClickCount(params).then(response => {
           if (response.code == 200) {
@@ -181,7 +178,7 @@
         })
       },
       async getUserBalance() {
-        if(window.web3) {
+        if(window.ethereum) {
           this.web3 = new Web3(web3.currentProvider)
           let address = await this.web3.eth.getAccounts()
           this.address = address[0]
@@ -208,7 +205,7 @@
   height: 100%;
   padding-top: 30px;
   .reward {
-    width: 800px;
+    width: 100%;
     height: 100px;
     display: flex;
     justify-content: space-between;
