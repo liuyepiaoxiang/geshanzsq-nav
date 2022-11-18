@@ -26,7 +26,7 @@
     },
     data() {
       return {
-        title: '格姗知识圈导航',
+        title: 'web3NAV',
         logo: logoImg
       }
     }

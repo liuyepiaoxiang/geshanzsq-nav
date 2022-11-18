@@ -11,7 +11,7 @@
           <div class="reward">
             <p style="margin-bottom: 12px;">作品累计点击量: {{ profit }}</p>
             <div>
-              <p>可换取收益: {{ profit / 5 }}</p>
+              <p>可换取收益: {{ profit / 5 }}Nav</p>
               <el-button :disabled="!stackStatus" @click="getReward">领取收益</el-button>
             </div>
             <div style="text-align:center">
@@ -42,15 +42,15 @@
         :before-close="handleClose">
         <div>
           <h4>为什么要进行创作者质押？</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+          <p>质押的目的是为了约束创作者，防止创作者上传违背社区价值，挑战社会公序良知的内容。如果创作者上传不符合社区规范的内容，我们会从创作者质押的代币中扣除一部分作为惩罚。</p>
         </div>
         <div>
           <h4>为什么要进行创作者质押？</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+          <p>目前，我们仅支持使用 MATIC币进行质押，质押数量不得低于0.01。点击下方【创作质押】按钮，根据提示即可完成创作者质押。</p>
         </div>
         <div>
           <h4>如何赎回创作者质押？</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+          <p>你可以前往个人中心，点击【解除质押】，我们会将你之前质押的MATIC返还到你的个人钱包；具体返还的数量=质押的数量-惩罚扣除的数量（在创作者作恶的情况下）。</p>
         </div>
         <el-dialog
           width="30%"
@@ -66,7 +66,7 @@
                 <p>注：</p>
                 <p>1、质押所需的Matic数量跟随web3n/Matic交易滑点变动；</p>
                 <p>2、确定质押后，质押完成时长取决于链上拥堵情况以及块更新速度，请耐心等待</p>
-                <p>3、如何获取Matic操作指引>></p>
+                <p>3、<a style="color: #5193d0" href="https://wiki.aavegotchi.com/cn/mumbai-testnet" target="_blank">如何获取MATIC(Mumbai)操作指引 >></a></p>
               </div>
             </el-card>
             <el-button style="width: 94%;margin-top: 15px;margin-left: 3%;" @click="staker" type="primary">确定质押</el-button>
@@ -151,18 +151,26 @@
       async staker() {
         if(window.ethereum) {
             this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
-            this.loading = true
             this.innerVisible = false
             this.dialogVisible = false
-            let result = await this.stakerContract.methods.stake().send({
+            this.stakerContract.methods.stake().send({
               from: this.address,
               value: 1000000000
             })
-            setTimeout(()=> {
-              this.loading = false;
-              this.getStakerStatus()
-              this.$message.success('提交成功')
-            }, 2000)
+              .on('transactionHash', (hash) => {
+                this.loading = true
+                // console.log(hash, '_transactionHash_')
+              })
+              .on('receipt', (receipt) => {
+                if (receipt.status) {
+                  this.loading = false
+                  this.getStakerStatus()
+                  this.$message.success('质押成功')
+                } else {
+                  this.loading = false
+                  this.$message.success('质押失败')
+                }
+              })
         } else {
           this.$message.warning("请安装metamask钱包")
         }
@@ -190,17 +198,33 @@
         this.stackStatus = status
         return status
       },
-      async initContract() {
+      async initState() {
         if(window.ethereum) {
           this.web3 = new Web3(web3.currentProvider)
           let address = await this.web3.eth.getAccounts()
+          // 记录钱包地址
           this.address = address[0]
           this.getStakerStatus()
+          this.getUserNavList()
+          this.getUserProfit()
         }
       },
       async cancelStaker() {
         if(window.ethereum) {
-            let response = await this.stakerContract.methods.withdraw().send({from: this.address})
+          this.stakerContract.methods.withdraw().send({from: this.address})
+          .on('transactionHash', (hash) => {
+            this.loading = true
+          })
+          .on('receipt', (receipt) => {
+            if (receipt.status) {
+              this.loading = false
+              this.getStakerStatus()
+              this.$message.success('解除成功')
+            } else {
+              this.loading = false
+              this.$message.success('解除失败')
+            }
+          })
         } else {
           this.$message.warning("请安装metamask钱包")
         }
@@ -245,15 +269,32 @@
       },
       goStaker() {
         this.innerVisible = true
-      }
+      },
+      blockSubscribe() {
+        this.subscription = web3.eth.subscribe('logs', {
+            address: '0x123456..',
+            topics: ['0x12345...']
+        }, function(error, result){
+            if (!error)
+                console.log(result);
+        })
+      },
+      blockUnSubscribe() {
+        this.subscription.unsubscribe(function(error, success){
+            if(success) {
+              console.log('Successfully unsubscribed!');
+            }
+        });
+      },
     },
     mounted() {
       this.getUserBalance()
     },
+    beforeDestroy() {
+      this.subscription
+    },
     created() {
-      this.initContract()
-      this.getUserNavList()
-      this.getUserProfit()
+      this.initState()
     }
   }
 </script>
