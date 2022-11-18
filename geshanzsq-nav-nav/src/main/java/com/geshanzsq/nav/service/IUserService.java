@@ -15,5 +15,5 @@ public interface IUserService {
 
 	int updatePledgeCount(User user);
 
-	long sumClickCountByUserWalletAddress(String userWalletAddress);
+	Long sumClickCountByUserWalletAddress(String userWalletAddress);
 }
