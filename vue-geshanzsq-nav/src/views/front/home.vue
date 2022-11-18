@@ -5,7 +5,7 @@
         <!-- <el-row :gutter="24" type="flex" justify="center">
            <el-col :sm="16" :sx="24">
             <search class="search"/>
-          </el-col> 
+          </el-col>
         </el-row> -->
         <addNavPanel></addNavPanel>
         <div v-for="menu in siteList">
@@ -105,6 +105,7 @@
           if (response.code == 200) {
             this.menuList = response.menus;
             this.siteList = response.sites;
+            console.log(this.siteList, '_this.siteList_')
             this.$store.commit('ADD_MENUS', this.menuList)
             this.loading = false;
           }

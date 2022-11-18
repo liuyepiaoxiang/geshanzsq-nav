@@ -1,20 +1,26 @@
 <template>
   <div style="padding: 0px">
     <front-home :menu-list="menuList">
-      <div slot="mainContainer" style="padding: 20px 5px 0px 5px">
+      <div slot="mainContainer" style="padding: 20px;height: calc(100vh - 137px);">
         <div class="personal_contain">
           <div class="reward">
-            <p>当前收益: {{dist}} nav</p>
-            <el-button :disabled="stackStatus" @click="getReward">领取收益</el-button>
-            <el-button :disabled="!stackStatus" @click="staker">质押</el-button>
-            <el-button :disabled="stackStatus" @click="cancelStaker">取消质押</el-button>
+            <p>累计点击量: {{ profit }}</p>
+            <!-- <p>累计点击量: profit{{ / 5}} nav</p> -->
+            <el-button :disabled="!stackStatus" @click="getReward">领取收益</el-button>
+            <!-- <el-button :disabled="stackStatus" @click="getReward">领取收益</el-button> -->
+            <el-button :disabled="stackStatus" @click="staker">质押</el-button>
+            <el-button :disabled="!stackStatus" @click="cancelStaker">取消质押</el-button>
           </div>
-          <p>我的创作</p>
-          <el-card class="box-card">
-            <div v-for="o in 4" :key="o" class="text item">
-              {{'列表内容 ' + o }}
-            </div>
-          </el-card>
+          <!-- <p>我的创作</p> -->
+          <el-row :gutter="24" >
+            <h4 style="margin-left: 12px">
+              <svg-icon icon-class="tag" style="margin-right: 7px;font-size: 18px"/>
+              <span style="color: #555;font-size: 17px;font-weight:normal">我的创作</span>
+            </h4>
+            <el-col :sm="6" :sx="24" style="margin-bottom: 15px" :key="'sitecard' + index" v-for="(site, index) in siteList">
+              <site-card :site="site" style="height: 90px"></site-card>
+            </el-col>
+          </el-row>
         </div>
       </div>
     </front-home>
@@ -30,14 +36,19 @@
   import { getNavAbout, getFrontMenu } from '@/api/front/frontNav'
 
   import Staker from '@/api/abi/Staker.json';
-  import Distribution from '@/api/abi/Distribution.json';
+  import Nav from '@/api/abi/Nav.json';
+  import NavReward from '@/api/abi/NavReward.json';
+
+  import SiteCard from "@/components/SiteCard/SiteCard";
 
   import { mapState } from 'vuex'
   import ResizeMixin from '@/views/front/mixin/ResizeHandler'
 
+  import { getUserFrontMenu, getUserClickCount } from '@/api/front/frontNav'
+
   export default {
     name: "about",
-    components: {FooterBottom,FrontHome,Comment},
+    components: {FooterBottom,FrontHome,Comment,SiteCard},
     data() {
       return {
         menuList: [],
@@ -47,10 +58,10 @@
         webConfig: {},
         stakerAddress: '0x3DAD3B10a77f4E0bA43c2FA79Cc48D5AB7B16F45',
         stackStatus: false,
-        distributionAddress: '0x60695ffCA42Bc16Ce08fC013AfECbe4902033c9a',
-        stackStatus: false,
-        erc20Arress: '0x21F813B20373D9B3dCf296e2c8d4c44fE507a162',
-        dist: 60
+        rewardAddress: '0x5Be0C36794b9f4Dcc5ec7553b50f84F223853Cd5',
+        erc20Arress: '0x6Ac120B418223F1c059D61f751D568544Bf4104e',
+        siteList: [],
+        profit: 0
       }
     },
     mixins: [ResizeMixin],
@@ -84,12 +95,13 @@
         })
       },
       async getReward() {
-        console.log(1, 'distributContract', this.address)
-        let distributContract =  new this.web3.eth.Contract(Distribution, this.distributionAddress, {
+        let distributContract =  new this.web3.eth.Contract(NavReward.abi, this.rewardAddress, {
           from: this.address
         })
-        let rest = await distributContract.methods.requestVolumeData().send({from: this.address})
-        this.$message.success('提取成功')
+        let response = await distributContract.methods.mintNav(this.address).send({from: this.address})
+        console.log(response, "_distributContract_")
+        this.$message.success('提现成功')
+        // let rest = await distributContract.methods.requestVolumeData().send({from: this.address})
       },
       async staker() {
         if(window.web3) {
@@ -125,16 +137,67 @@
           this.web3 = new Web3(web3.currentProvider)
           let address = await this.web3.eth.getAccounts()
           this.address = address[0]
+
           this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
-          this.stackStatus = await this.stakerContract.methods.getUserStackStatus().call()
+          let status = await this.stakerContract.methods.getUserStackStatus().call({
+            from: this.address
+          })
+          console.log('_initContract_', status)
+
+          this.stackStatus = status
         }
       },
-      cancelStaker() {
+      async cancelStaker() {
+        if(window.web3) {
+            // this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+            let response = await this.stakerContract.methods.withdraw().send({from: this.address})
+            console.log(response, '_this.stakerOperator_')
+            // this.balances = this.stakerOperator.methods.balances(this.$store.user.address)
+            // if(this.balances !== 0) {
+            //     this.isUserStaked = true;
+            // }
+        }
+      },
+      getUserNavList() {
+        let params = {
+          userWalletAddress: '0x0914f881EC583fCD460031A93B135B9a706ADeBE'
+        }
+        getUserFrontMenu(params).then(response => {
+          if (response.code == 200) {
+            this.siteList = response.rows
+          }
+        }).catch(error => {
+        })
+      },
+      getUserProfit() {
+        let params = {
+          userWalletAddress: '0x0914f881EC583fCD460031A93B135B9a706ADeBE'
+        }
+        getUserClickCount(params).then(response => {
+          if (response.code == 200) {
+            this.profit = response.data
+          }
+        }).catch(error => {
+        })
+      },
+      async getUserBalance() {
+        if(window.web3) {
+          this.web3 = new Web3(web3.currentProvider)
+          let address = await this.web3.eth.getAccounts()
+          this.address = address[0]
+          this.ERCContract = new this.web3.eth.Contract(Nav.abi, this.erc20Arress)
+          let result = await this.ERCContract.methods.balanceOf(this.address).call()
+        }
 
       }
     },
     mounted() {
+      this.getUserBalance()
+    },
+    created() {
       this.initContract()
+      this.getUserNavList()
+      this.getUserProfit()
     }
   }
 </script>
