@@ -1,5 +1,10 @@
 <template>
-  <div style="padding: 0px">
+  <div style="padding: 0px"
+    v-loading="loading"
+    element-loading-text="获取结果中..."
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
     <front-home :menu-list="menuList">
       <div slot="mainContainer" style="padding: 20px;height: calc(100vh - 137px);">
         <div class="personal_contain">
@@ -12,7 +17,7 @@
             <div style="text-align:center">
               <p style="margin-bottom: 12px;">质押状态：{{stackStatus ? '已完成质押' : '未参与质押'}}</p>
               <div style="">
-                <el-button :disabled="stackStatus" @click="staker">参与质押</el-button>
+                <el-button :disabled="stackStatus" @click="showStakerDialog">参与质押</el-button>
                 <el-button :disabled="!stackStatus" @click="cancelStaker">取消质押</el-button>
               </div>
             </div>
@@ -30,6 +35,48 @@
         </div>
       </div>
     </front-home>
+    <el-dialog
+        title="请完成创作者质押"
+        :visible.sync="dialogVisible"
+        width="70%"
+        :before-close="handleClose">
+        <div>
+          <h4>为什么要进行创作者质押？</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+        </div>
+        <div>
+          <h4>为什么要进行创作者质押？</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+        </div>
+        <div>
+          <h4>如何赎回创作者质押？</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam fermentum, nulla luctus pharetra vulputate, felis tellus mollis orci, sed rhoncus sapien nunc eget.</p>
+        </div>
+        <el-dialog
+          width="30%"
+          title="创作者质押"
+          :visible.sync="innerVisible"
+          append-to-body>
+          <div>
+            <el-card class="box-card">
+              <div>
+                所需Matic代币数 0.01
+              </div>
+              <div>
+                <p>注：</p>
+                <p>1、质押所需的Matic数量跟随web3n/Matic交易滑点变动；</p>
+                <p>2、确定质押后，质押完成时长取决于链上拥堵情况以及块更新速度，请耐心等待</p>
+                <p>3、如何获取Matic操作指引>></p>
+              </div>
+            </el-card>
+            <el-button style="width: 94%;margin-top: 15px;margin-left: 3%;" @click="staker" type="primary">确定质押</el-button>
+          </div>
+        </el-dialog>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="goStaker">去完成质押</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -67,6 +114,8 @@
         rewardAddress: '0x5Be0C36794b9f4Dcc5ec7553b50f84F223853Cd5',
         erc20Arress: '0x6Ac120B418223F1c059D61f751D568544Bf4104e',
         siteList: [],
+        dialogVisible: false,
+        innerVisible: false,
         profit: 0
       }
     },
@@ -90,16 +139,6 @@
           this.menuList = response.menus;
         })
       },
-      /** 获取关于本站内容 */
-      getNavAbout() {
-        this.loading = true;
-        getNavAbout().then(response => {
-          this.webConfig = response.data;
-          this.loading = false;
-        }).catch(error => {
-          this.loading = false;
-        })
-      },
       async getReward() {
         let distributContract =  new this.web3.eth.Contract(NavReward.abi, this.rewardAddress, {
           from: this.address
@@ -112,10 +151,18 @@
       async staker() {
         if(window.ethereum) {
             this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
-            await this.stakerContract.methods.stake().send({
-                from: this.address,
-                value: 1000000000
+            this.loading = true
+            this.innerVisible = false
+            this.dialogVisible = false
+            let result = await this.stakerContract.methods.stake().send({
+              from: this.address,
+              value: 1000000000
             })
+            setTimeout(()=> {
+              this.loading = false;
+              this.getStakerStatus()
+              this.$message.success('提交成功')
+            }, 2000)
         } else {
           this.$message.warning("请安装metamask钱包")
         }
@@ -135,17 +182,20 @@
             this.isConnect = true;
         });
       },
+      async getStakerStatus() {
+        this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+        let status = await this.stakerContract.methods.getUserStackStatus().call({
+          from: this.address
+        })
+        this.stackStatus = status
+        return status
+      },
       async initContract() {
         if(window.ethereum) {
           this.web3 = new Web3(web3.currentProvider)
           let address = await this.web3.eth.getAccounts()
           this.address = address[0]
-
-          this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
-          let status = await this.stakerContract.methods.getUserStackStatus().call({
-            from: this.address
-          })
-          this.stackStatus = status
+          this.getStakerStatus()
         }
       },
       async cancelStaker() {
@@ -157,7 +207,7 @@
       },
       getUserNavList() {
         let params = {
-          userWalletAddress: '0x0914f881EC583fCD460031A93B135B9a706ADeBE'
+          userWalletAddress: this.address
         }
         getUserFrontMenu(params).then(response => {
           if (response.code == 200) {
@@ -186,6 +236,15 @@
           let result = await this.ERCContract.methods.balanceOf(this.address).call()
         }
 
+      },
+      handleClose() {
+        console.log("handleClose")
+      },
+      showStakerDialog() {
+        this.dialogVisible = true
+      },
+      goStaker() {
+        this.innerVisible = true
       }
     },
     mounted() {
