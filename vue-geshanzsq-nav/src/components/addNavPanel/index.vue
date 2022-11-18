@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import Staker from '@/api/abi/Staker.json';
 import addNavDialog from './addNavDialog.vue';
   export default {
   components: { addNavDialog },
@@ -18,11 +19,32 @@ import addNavDialog from './addNavDialog.vue';
   data() {
     return {
       showAddNavDialog: false,
+      stakerAddress: '0x3DAD3B10a77f4E0bA43c2FA79Cc48D5AB7B16F45'
     }
   },
   methods: {
     addNav() {
+      let status = this.getStakerStatus()
+      if (status) {
+        this.$message.error('请到个人中心完成质押')
+      } else {
         this.showAddNavDialog = true;
+      }
+    },
+    async getStakerStatus() {
+      if(window.ethereum) {
+        this.web3 = new Web3(web3.currentProvider)
+        let address = await this.web3.eth.getAccounts()
+        this.address = address[0]
+
+        this.stakerContract = new this.web3.eth.Contract(Staker, this.stakerAddress)
+        let status = await this.stakerContract.methods.getUserStackStatus().call({
+          from: this.address
+        })
+        return status
+      } else {
+        return false
+      }
     },
     closeDialog() {
         this.showAddNavDialog = false;
